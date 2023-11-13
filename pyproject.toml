@@ -1,6 +1,30 @@
 [project]
 name = 'django-keyring'
 version = '1.0.0'
-
+authors = [
+  { name="Dann Luciano", email="dannluciano@ifpi.edu.br" },
+]
+description = "Django Integration with Keyringpy"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+keywords = ["django", "keyringpy", "cryptography"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Framework :: Django",
+    "Topic :: Security :: Cryptography",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "django >= 4.2",
+    "keyringpy",
+]
 [tool.setuptools]
 py-modules = ['keyring']
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+[project.urls]
+"Homepage" = "https://github.com/dannluciano/django-keyring"
+"Bug Tracker" = "https://github.com/dannluciano/django-keyring/issues"
