@@ -1,0 +1,6 @@
+[project]
+name = 'django-keyring'
+version = '1.0.0'
+
+[tool.setuptools]
+py-modules = ['keyring']
