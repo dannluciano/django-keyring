@@ -128,6 +128,18 @@ class Message(models.Model):
 
 ```
 
+Use your model normaly. In database your users data are cryptographed.
+
+```sql
+# sqlite3 db.sqlite
+sqlite> .mode column
+sqlite> SELECT * FROM sample_app_message;
+id  user    text    room    user_encrypted_with_key user_digest text_encrypted_with_key room_encrypted_with_key room_sha_digest
+1   SEmy... 8nDD... nFRB... 2   2b248a5d... 2 2 cef4523d1ec9...
+...
+sqlite>
+```
+
 <!-- #### Change encryption algorithm
 
 You can choose between `AES-128-CBC`, `AES-192-CBC` and `AES-256-CBC`. By
