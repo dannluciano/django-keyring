@@ -72,6 +72,7 @@ encryption keys. The keyring must be a Dictionary object mapping numeric ids of 
 keys to the key values. A keyring must have at least one key. For example:
 
 ```python settings.py
+# settings.py
 ...
 KEYRINGPY_KEYS = {
     "1": "uDiMcWVNTuz//naQ88sOcN+E40CyBRGzGTT7OkoBS6M=",
@@ -111,6 +112,7 @@ configuration management software (e.g. Ansible, Puppet, Chef, etc).
 ### Basic usage of django-keyring
 
 ```python models.py
+# models.py
 from django.db import models
 from keyring.fields import KeyringField
 
