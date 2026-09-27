@@ -1,9 +1,7 @@
 [project]
 name = 'django-keyring'
-version = '1.0.0'
-authors = [
-  { name="Dann Luciano", email="dannluciano@ifpi.edu.br" },
-]
+version = '2.0.0'
+authors = [{ name = "Dann Luciano", email = "dannluciano@ifpi.edu.br" }]
 description = "Django Integration with Keyringpy"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -16,12 +14,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = [
-    "django >= 4.2",
-    "keyringpy",
-]
+dependencies = ["django >= 4.2", "keyringpy"]
 [tool.setuptools]
-py-modules = ['keyring']
+packages = ['keyring']
 [build-system]
 requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
