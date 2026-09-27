@@ -3,41 +3,61 @@ from django.test import TestCase
 from .models import Message
 
 
-class MessageTestCase(TestCase):
-    def setUp(self):
-        Message.objects.create(
-            user = 'dannluciano',
-            text = 'Hello World',
-            room = 'irc'
-        )
+class MessageKeyringTests(TestCase):
+    def create_message(self, **values):
+        defaults = {"user": "dannluciano", "text": "Hello World", "room": "irc"}
+        defaults.update(values)
+        return Message.objects.create(**defaults)
 
-    def test_encrypt_and_decrypt(self):
-        message = Message.objects.first()
+    def test_message_values_round_trip_through_database(self):
+        message = self.create_message()
 
-        self.assertEqual(message.user, 'dannluciano')
-        self.assertEqual(message.text, 'Hello World')
-        self.assertEqual(message.room, 'irc')
+        loaded_message = Message.objects.get(pk=message.pk)
 
-    def test_existence_and_value_of_generated_fields_of_user(self):
-        message = Message.objects.first()
+        self.assertEqual(loaded_message.user, "dannluciano")
+        self.assertEqual(loaded_message.text, "Hello World")
+        self.assertEqual(loaded_message.room, "irc")
 
-        self.assertTrue(hasattr(message, 'user_encrypted_with_key'))
-        self.assertEqual(message.user_encrypted_with_key, 2)
+    def test_database_stores_ciphertext_and_one_shared_key_id(self):
+        message = self.create_message()
 
-        self.assertTrue(hasattr(message, 'user_digest'))
-        self.assertEqual(message.user_digest, '2b248a5decf84d3ea324933412f0b2fab4e498dd')
+        stored_values = Message.objects.filter(pk=message.pk).values(
+            "user",
+            "text",
+            "room",
+            "encrypted_with_key",
+        ).get()
 
-    def test_existence_and_value_of_generated_fields_of_text(self):
-        message = Message.objects.first()
+        self.assertNotEqual(stored_values["user"], "dannluciano")
+        self.assertNotEqual(stored_values["text"], "Hello World")
+        self.assertNotEqual(stored_values["room"], "irc")
+        self.assertEqual(stored_values["encrypted_with_key"], 2)
 
-        self.assertTrue(hasattr(message, 'text_encrypted_with_key'))
-        self.assertEqual(message.text_encrypted_with_key, 2)   
+        key_id_fields = [
+            field
+            for field in Message._meta.local_fields
+            if field.name == "encrypted_with_key"
+        ]
+        self.assertEqual(len(key_id_fields), 1)
 
-    def test_existence_and_value_of_generated_fields_of_room(self):
-        message = Message.objects.first()
+    def test_generated_digests_are_saved(self):
+        message = self.create_message()
 
-        self.assertTrue(hasattr(message, 'room_encrypted_with_key'))
-        self.assertEqual(message.user_encrypted_with_key, 2)
+        self.assertEqual(message.user_digest, "2b248a5decf84d3ea324933412f0b2fab4e498dd")
+        self.assertEqual(message.room_sha_digest, "cef4523d1ec94268969ac9c14fa8341e2ecfb678")
 
-        self.assertTrue(hasattr(message, 'room_sha_digest'))
-        self.assertEqual(message.room_sha_digest, 'cef4523d1ec94268969ac9c14fa8341e2ecfb678')
+    def test_string_representation_uses_decrypted_text(self):
+        message = self.create_message()
+
+        loaded_message = Message.objects.get(pk=message.pk)
+
+        self.assertEqual(str(loaded_message), "Hello World")
+
+    def test_empty_values_can_be_saved_and_loaded(self):
+        message = self.create_message(user="", text="", room="")
+
+        loaded_message = Message.objects.get(pk=message.pk)
+
+        self.assertEqual(loaded_message.user, "")
+        self.assertEqual(loaded_message.text, "")
+        self.assertEqual(loaded_message.room, "")
